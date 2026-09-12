@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node ./dist/main.js",
     "dev": "tsx watch src/main.ts",
+    "seed": "tsx src/seeders/run-seed.ts",
     "format": "prettier ./src/ --write",
     "prepare": "husky"
   },
