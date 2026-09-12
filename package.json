@@ -1,0 +1,37 @@
+{
+  "name": "fm_crowdfunding-backend",
+  "version": "1.0.0",
+  "description": "Basic backend for crowdfunding page project",
+  "main": "/dist/main.js",
+  "scripts": {
+    "lint": "eslint ./src/",
+    "build": "tsc",
+    "start": "node ./dist/main.js",
+    "dev": "tsx watch src/main.ts",
+    "format": "prettier ./src/ --write",
+    "prepare": "husky"
+  },
+  "keywords": [],
+  "author": "Ariel Molina",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "17.4.2",
+    "express": "5.2.1",
+    "mongoose": "9.9.5"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.2.2",
+    "@commitlint/config-conventional": "21.2.2",
+    "@eslint/js": "10.0.1",
+    "@types/express": "5.0.6",
+    "@types/node": "26.4.1",
+    "eslint": "10.10.0",
+    "globals": "17.12.0",
+    "husky": "9.1.7",
+    "prettier": "3.9.6",
+    "tsx": "4.23.13",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.70.0"
+  }
+}
