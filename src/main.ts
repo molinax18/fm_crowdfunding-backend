@@ -4,7 +4,7 @@ const PORT = process.env.PORT ?? 3000;
 const app = express();
 app.use(json());
 
-app.get("/", (_req, res) => {
+app.get("/", async (_req, res) => {
   res.status(200).json({ message: "Backend on line!" });
 });
 
