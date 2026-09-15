@@ -42,4 +42,4 @@ const rewardSchema = new Schema<IRewardSchema>(
   { timestamps: true },
 );
 
-export const Reward = model<IRewardSchema>("Reward", rewardSchema);
+export const Reward = model<IRewardSchema>("reward", rewardSchema);

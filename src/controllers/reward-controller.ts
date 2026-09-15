@@ -17,7 +17,7 @@ class RewardController {
       const id = req.params.id;
 
       if (typeof id !== "string" || !isValidObjectId(id)) {
-        return res.status(400).json({ message: "Please send a valid request" });
+        return res.status(400).json({ message: "Please send a valid id" });
       }
 
       const response = await rewardService.deleteById(id);

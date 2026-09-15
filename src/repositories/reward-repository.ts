@@ -1,7 +1,4 @@
-import { connectToMongo } from "../lib/db.js";
 import { Reward } from "../schemas/reward-schema.js";
-
-await connectToMongo();
 
 class RewardRepository {
   async getAll() {
