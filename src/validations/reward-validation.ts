@@ -21,7 +21,13 @@ export const reward = z.object({
 
 export type TRewardInput = z.infer<typeof reward>;
 const compiledReward = z.compile(reward);
-const compiledPartialReward = z.compile(z.deepPartial(reward));
+const partialReward = z
+  .deepPartial(reward)
+  .refine((data) => Object.keys(data).length > 0, {
+    error: "At least one field is required",
+  });
+
+const compiledPartialReward = z.compile(partialReward);
 
 export function validateReward(data: TRewardInput) {
   return compiledReward.safeParse(data);

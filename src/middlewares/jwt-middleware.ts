@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { validateToken as validate } from "../utils/jwt-util.js";
 import { userService } from "../services/user-service.js";
+import jwt from "jsonwebtoken";
 
 export async function validateToken(
   req: Request,
@@ -18,13 +19,6 @@ export async function validateToken(
   try {
     const token = authHeader.slice(7);
     const data = await validate(token);
-
-    if (!data || !("id" in data)) {
-      return res.status(401).json({
-        error: "Invalid or expired token",
-      });
-    }
-
     const user = await userService.getById(data.id);
 
     if (!user || !user.active) {
@@ -35,9 +29,22 @@ export async function validateToken(
 
     req.headers.user_id = data.id;
     return next();
-  } catch {
-    return res.status(500).json({
-      error: "Internal server error",
-    });
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({
+        error: "TOKEN_EXPIRED",
+        message: "The token was expired",
+        expired_at: error.expiredAt,
+      });
+    }
+
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(403).json({
+        error: "INVALID_TOKEN",
+        message: "Token invalid",
+      });
+    }
+
+    return res.status(500).json({ message: "Error interno del servidor" });
   }
 }

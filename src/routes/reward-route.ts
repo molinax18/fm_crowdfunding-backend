@@ -6,4 +6,9 @@ export const rewardRouter = Router();
 
 rewardRouter.get("/", rewardController.getAll);
 rewardRouter.post("/", validateToken, rewardController.create);
-rewardRouter.delete("/:id", rewardController.deleteById);
+rewardRouter.put("/:id", validateToken, rewardController.modifyByUserCreatorId);
+rewardRouter.delete(
+  "/:id",
+  validateToken,
+  rewardController.hardDeleteByUserCreatorId,
+);

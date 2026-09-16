@@ -12,10 +12,30 @@ class RewardService {
     }
   }
 
-  async deleteById(id: string) {
+  async modifyByUserCreatorId(
+    userId: string,
+    rewardId: string,
+    reward: Partial<TRewardInput>,
+  ) {
     try {
-      const rewards = await rewardRepository.deleteById(id);
-      return rewards;
+      const modifiedReward = await rewardRepository.modifyByUserCreatorId(
+        userId,
+        rewardId,
+        reward,
+      );
+      return modifiedReward;
+    } catch (error) {
+      throw new Error("Cannot resolve the service", { cause: error });
+    }
+  }
+
+  async hardDeleteByUserCreatorId(userId: string, rewardId: string) {
+    try {
+      const deletedReward = await rewardRepository.hardDeleteByUserCreatorId(
+        userId,
+        rewardId,
+      );
+      return deletedReward;
     } catch (error) {
       throw new Error("Cannot resolve the service", { cause: error });
     }

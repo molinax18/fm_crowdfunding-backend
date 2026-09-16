@@ -32,11 +32,14 @@ export function signToken(val: IUserToken) {
   };
 }
 
-export async function validateToken(token: string) {
-  try {
-    const decoded = jwt.verify(token, getSecretKey());
-    return typeof decoded === "string" ? null : decoded;
-  } catch {
-    return null;
-  }
+export function validateToken(token: string): Promise<IUserToken> {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, getSecretKey(), (err, decoded) => {
+      if (err) {
+        return reject(err);
+      }
+
+      resolve(decoded as IUserToken);
+    });
+  });
 }

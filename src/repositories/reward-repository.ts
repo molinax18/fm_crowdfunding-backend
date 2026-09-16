@@ -12,6 +12,45 @@ class RewardRepository {
     }
   }
 
+  async modifyByUserCreatorId(
+    userId: string,
+    rewardId: string,
+    reward: Partial<TRewardInput>,
+  ) {
+    try {
+      return Reward.findOneAndUpdate(
+        {
+          _id: rewardId,
+          created_by: userId,
+        },
+        {
+          $set: { ...reward },
+        },
+        {
+          returnDocument: "after",
+          runValidators: true,
+        },
+      )
+        .populate("created_by")
+        .exec();
+    } catch (error) {
+      throw new Error("Cannot modify the resource", { cause: error });
+    }
+  }
+
+  async hardDeleteByUserCreatorId(userId: string, rewardId: string) {
+    try {
+      return Reward.findOneAndDelete({
+        _id: rewardId,
+        created_by: userId,
+      })
+        .populate("created_by")
+        .exec();
+    } catch (error) {
+      throw new Error("Cannot delete the resource", { cause: error });
+    }
+  }
+
   async getAll() {
     try {
       const rewards = await Reward.find({})

@@ -1,7 +1,11 @@
 import type { Request, Response } from "express";
 import { isValidObjectId, Types } from "mongoose";
 import { rewardService } from "../services/reward-service.js";
-import { validateReward } from "../validations/reward-validation.js";
+import {
+  type TRewardInput,
+  validatePartialReward,
+  validateReward,
+} from "../validations/reward-validation.js";
 
 class RewardController {
   async getAll(_req: Request, res: Response) {
@@ -41,21 +45,64 @@ class RewardController {
     }
   }
 
-  async deleteById(req: Request, res: Response) {
+  async modifyByUserCreatorId(req: Request, res: Response) {
     try {
-      const id = req.params.id;
+      const input = req.body;
+      const userId = req.headers.user_id as string;
+      const { id } = req.params;
 
-      if (typeof id !== "string" || !isValidObjectId(id)) {
+      const { success, error, data } = validatePartialReward(input);
+
+      if (!success) {
+        return res.status(400).json({
+          data: "Please complete all the fields",
+          details: error.issues.map(({ code, message, path }) => ({
+            path,
+            code,
+            message,
+          })),
+        });
+      }
+
+      if (!isValidObjectId(id) || !isValidObjectId(userId)) {
         return res.status(400).json({ message: "Please send a valid id" });
       }
 
-      const response = await rewardService.deleteById(id);
+      const response = await rewardService.modifyByUserCreatorId(
+        userId,
+        id as string,
+        data as Partial<TRewardInput>,
+      );
 
       if (!response) {
         return res.status(404).json({ message: "Resource not found" });
       }
 
-      res.status(203).json({ result: response });
+      res.status(200).json({ result: response });
+    } catch {
+      res.status(500).json({ message: "Something was wrong" });
+    }
+  }
+
+  async hardDeleteByUserCreatorId(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = req.headers.user_id as string;
+
+      if (!isValidObjectId(id) || !isValidObjectId(userId)) {
+        return res.status(400).json({ message: "Please send a valid id" });
+      }
+
+      const response = await rewardService.hardDeleteByUserCreatorId(
+        userId,
+        id as string,
+      );
+
+      if (!response) {
+        return res.status(404).json({ message: "Resource not found" });
+      }
+
+      res.status(200).json({ result: response });
     } catch {
       res.status(500).json({ message: "Something was wrong" });
     }

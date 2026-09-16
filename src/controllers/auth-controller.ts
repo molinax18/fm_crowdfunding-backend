@@ -1,9 +1,7 @@
 import type { Request, Response } from "express";
 import { authService } from "../services/auth-service.js";
-import { validateToken } from "../utils/jwt-util.js";
 import { validateUser } from "../validations/user-validation.js";
 import { validateAuthUser } from "../validations/auth-validation.js";
-import { userService } from "../services/user-service.js";
 
 class AuthController {
   async register(req: Request, res: Response) {
@@ -62,53 +60,6 @@ class AuthController {
         message: "Logged successfully",
         accessToken: token,
       });
-    } catch {
-      res.status(500).json({ message: "Something was wrong" });
-    }
-  }
-
-  async refreshToken(req: Request, res: Response) {
-    try {
-      const authHeader = req.get("Authorization");
-
-      if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res
-          .status(401)
-          .json({ error: "Missing or malformed Authorization header" });
-      }
-
-      const oldToken = authHeader.split(" ")[1] ?? "";
-      const { refreshToken } = req.body;
-      const actual = await validateToken(refreshToken);
-
-      if (!actual || !("id" in actual)) {
-        return res.status(401).json({
-          error: "Invalid or expired token",
-        });
-      }
-
-      const data = await validateToken(actual.token);
-
-      if (!data || !("id" in data)) {
-        return res.status(401).json({
-          error: "Invalid or expired token",
-        });
-      }
-
-      const user = await userService.getById(data.id);
-
-      if (!user || !user.active) {
-        return res.status(401).json({
-          error: "This account does not exist or is inactive",
-        });
-      }
-
-      if (oldToken !== actual.token) {
-        return res.status(403).json({ mesage: "Token doesn't match" });
-      }
-
-      await authService.refreshToken({ id: user.id, email: user.email });
-      res.status(200).json({ token: "New token generated" });
     } catch {
       res.status(500).json({ message: "Something was wrong" });
     }
