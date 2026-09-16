@@ -1,9 +1,9 @@
 import type { Request, Response } from "express";
-import type { JwtPayload } from "jsonwebtoken";
 import { authService } from "../services/auth-service.js";
-import { validateToken, type IUserToken } from "../utils/jwt-util.js";
+import { validateToken } from "../utils/jwt-util.js";
 import { validateUser } from "../validations/user-validation.js";
 import { validateAuthUser } from "../validations/auth-validation.js";
+import { userService } from "../services/user-service.js";
 
 class AuthController {
   async register(req: Request, res: Response) {
@@ -79,10 +79,31 @@ class AuthController {
 
       const oldToken = authHeader.split(" ")[1] ?? "";
       const { refreshToken } = req.body;
-      const { actualToken } = (await validateToken(refreshToken)) as JwtPayload;
-      const user = (await validateToken(actualToken)) as IUserToken;
+      const actual = await validateToken(refreshToken);
 
-      if (oldToken !== actualToken) {
+      if (!actual || !("id" in actual)) {
+        return res.status(401).json({
+          error: "Invalid or expired token",
+        });
+      }
+
+      const data = await validateToken(actual.token);
+
+      if (!data || !("id" in data)) {
+        return res.status(401).json({
+          error: "Invalid or expired token",
+        });
+      }
+
+      const user = await userService.getById(data.id);
+
+      if (!user || !user.active) {
+        return res.status(401).json({
+          error: "This account does not exist or is inactive",
+        });
+      }
+
+      if (oldToken !== actual.token) {
         return res.status(403).json({ mesage: "Token doesn't match" });
       }
 

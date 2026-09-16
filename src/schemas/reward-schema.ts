@@ -1,17 +1,23 @@
-import { model, Schema, type Document } from "mongoose";
+import { model, Schema, Types, type Document } from "mongoose";
 
 export type TReward = {
   title: string;
   description: string;
   min_pledge: number;
   remaining: number;
-  isActive: boolean;
+  active: boolean;
 };
 
-export interface IRewardSchema extends TReward, Document {}
+export interface IRewardSchema extends TReward, Document {
+  created_by: Types.ObjectId;
+}
 
 const rewardSchema = new Schema<IRewardSchema>(
   {
+    created_by: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
     title: {
       type: String,
       required: true,
@@ -34,7 +40,7 @@ const rewardSchema = new Schema<IRewardSchema>(
       min: 0,
       default: 0,
     },
-    isActive: {
+    active: {
       type: Boolean,
       default: true,
     },

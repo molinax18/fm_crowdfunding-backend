@@ -1,12 +1,41 @@
 import type { Request, Response } from "express";
-import { isValidObjectId } from "mongoose";
+import { isValidObjectId, Types } from "mongoose";
 import { rewardService } from "../services/reward-service.js";
+import { validateReward } from "../validations/reward-validation.js";
 
 class RewardController {
   async getAll(_req: Request, res: Response) {
     try {
       const rewards = await rewardService.getAll();
       res.status(200).json({ result: rewards });
+    } catch {
+      res.status(500).json({ message: "Something was wrong" });
+    }
+  }
+
+  async create(req: Request, res: Response) {
+    try {
+      const input = req.body;
+      const { success, error, data } = validateReward(input);
+
+      if (!success) {
+        return res.status(400).json({
+          data: "Please complete all the fields",
+          details: error.issues.map(({ code, message, path }) => ({
+            path,
+            code,
+            message,
+          })),
+        });
+      }
+
+      const userId = req.headers.user_id as string;
+      const newReward = await rewardService.create(
+        data,
+        new Types.ObjectId(userId),
+      );
+
+      return res.status(201).json(newReward);
     } catch {
       res.status(500).json({ message: "Something was wrong" });
     }

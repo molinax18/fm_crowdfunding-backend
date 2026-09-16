@@ -35,8 +35,8 @@ export function signToken(val: IUserToken) {
 export async function validateToken(token: string) {
   try {
     const decoded = jwt.verify(token, getSecretKey());
-    return decoded;
-  } catch (error) {
-    throw new Error("Error with the token validation", { cause: error });
+    return typeof decoded === "string" ? null : decoded;
+  } catch {
+    return null;
   }
 }
