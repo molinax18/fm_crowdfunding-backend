@@ -1,11 +1,7 @@
 import type { Request, Response } from "express";
-import { isValidObjectId, Types } from "mongoose";
+import type { TRewardInput } from "../validations/reward-validation.js";
+import { Types } from "mongoose";
 import { rewardService } from "../services/reward-service.js";
-import {
-  type TRewardInput,
-  validatePartialReward,
-  validateReward,
-} from "../validations/reward-validation.js";
 
 class RewardController {
   async getAll(_req: Request, res: Response) {
@@ -19,23 +15,10 @@ class RewardController {
 
   async create(req: Request, res: Response) {
     try {
-      const input = req.body;
-      const { success, error, data } = validateReward(input);
-
-      if (!success) {
-        return res.status(400).json({
-          data: "Please complete all the fields",
-          details: error.issues.map(({ code, message, path }) => ({
-            path,
-            code,
-            message,
-          })),
-        });
-      }
-
+      const reward = req.body;
       const userId = req.headers.user_id as string;
       const newReward = await rewardService.create(
-        data,
+        reward,
         new Types.ObjectId(userId),
       );
 
@@ -47,31 +30,14 @@ class RewardController {
 
   async modifyByUserCreatorId(req: Request, res: Response) {
     try {
-      const input = req.body;
+      const reward = req.body;
       const userId = req.headers.user_id as string;
       const { id } = req.params;
-
-      const { success, error, data } = validatePartialReward(input);
-
-      if (!success) {
-        return res.status(400).json({
-          data: "Please complete all the fields",
-          details: error.issues.map(({ code, message, path }) => ({
-            path,
-            code,
-            message,
-          })),
-        });
-      }
-
-      if (!isValidObjectId(id) || !isValidObjectId(userId)) {
-        return res.status(400).json({ message: "Please send a valid id" });
-      }
 
       const response = await rewardService.modifyByUserCreatorId(
         userId,
         id as string,
-        data as Partial<TRewardInput>,
+        reward as Partial<TRewardInput>,
       );
 
       if (!response) {
@@ -88,10 +54,6 @@ class RewardController {
     try {
       const { id } = req.params;
       const userId = req.headers.user_id as string;
-
-      if (!isValidObjectId(id) || !isValidObjectId(userId)) {
-        return res.status(400).json({ message: "Please send a valid id" });
-      }
 
       const response = await rewardService.hardDeleteByUserCreatorId(
         userId,
