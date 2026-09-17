@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 import { connectToMongo } from "./db.js";
 import { Reward } from "../schemas/reward-schema.js";
 import { User } from "../schemas/user-schema.js";
-import { rewards } from "../seeders/rewards.js";
-import { users } from "../seeders/users-reward.js";
+import { rewards } from "../seeders/rewards-seed.js";
+import { users } from "../seeders/users-seed.js";
 
 try {
   await connectToMongo();
