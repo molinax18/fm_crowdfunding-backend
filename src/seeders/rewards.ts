@@ -1,10 +1,17 @@
-import type { TRewardInput } from "../validations/reward-validation.js";
+import { Types } from "mongoose";
+import type { TReward } from "../schemas/reward-schema.js";
 
-export const rewards: TRewardInput[] = [
+type TSeedReward = TReward & {
+  created_by: Types.ObjectId;
+};
+
+export const rewards: TSeedReward[] = [
   {
-    title: "Bamboo Stand",
+    created_by: new Types.ObjectId("6aa9a0d07a2ba281c1770877"),
+    title: "Bamboo Stand Ultimate Ultimate Edition",
     description: "An ergonomic stand made of natural bamboo.",
-    min_pledge: 25,
-    remaining: 101,
+    min_pledge: 999,
+    remaining: 2,
+    active: true,
   },
 ];
