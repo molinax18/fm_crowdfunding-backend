@@ -5,3 +5,5 @@ export const authRouter = Router();
 
 authRouter.post("/register", authController.register);
 authRouter.post("/login", authController.login);
+authRouter.post("/validate", authController.validateOtp);
+authRouter.post("/resend_otp", authController.resendValidationOtp);

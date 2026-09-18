@@ -1,5 +1,5 @@
 import type { TUserInput } from "../validations/user-validation.js";
-import { User } from "../schemas/user-schema.js";
+import { User, type TUser } from "../schemas/user-schema.js";
 
 class UserRepository {
   async create(user: TUserInput) {
@@ -8,6 +8,23 @@ class UserRepository {
       return newUser;
     } catch (error) {
       throw new Error("Cannot create the resource", { cause: error });
+    }
+  }
+
+  async update(userId: string, user: Partial<TUser>) {
+    try {
+      const updatedUser = await User.findOneAndUpdate(
+        {
+          _id: userId,
+          active: true,
+        },
+        {
+          $set: { ...user },
+        },
+      ).exec();
+      return updatedUser;
+    } catch (error) {
+      throw new Error("Cannot access to the resource", { cause: error });
     }
   }
 

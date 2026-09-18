@@ -1,8 +1,9 @@
 import type { TUserInput } from "../validations/user-validation.js";
 import type { TUserAuthInput } from "../validations/auth-validation.js";
 import { userRepository } from "../repositories/user-repository.js";
-import { comparePassword, encryptPassword } from "../utils/encrypt-util.js";
+import { compare, encrypt } from "../utils/encrypt-util.js";
 import { signToken, type IUserToken } from "../utils/jwt-util.js";
+import { otpService } from "./otp-service.js";
 
 class AuthService {
   async register(data: TUserInput) {
@@ -13,9 +14,10 @@ class AuthService {
         return null;
       }
 
-      const hashed = await encryptPassword(data.password);
+      const hashed = await encrypt(data.password);
       const user = { ...data, password: hashed };
       const newUser = await userRepository.create(user);
+      await otpService.create(user.email);
 
       return newUser;
     } catch (error) {
@@ -30,7 +32,7 @@ class AuthService {
       return null;
     }
 
-    const isValidPassword = await comparePassword(data.password, user.password);
+    const isValidPassword = await compare(data.password, user.password);
 
     if (!isValidPassword) {
       return null;

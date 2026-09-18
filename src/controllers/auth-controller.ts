@@ -2,6 +2,9 @@ import type { Request, Response } from "express";
 import { authService } from "../services/auth-service.js";
 import { validateUser } from "../validations/user-validation.js";
 import { validateAuthUser } from "../validations/auth-validation.js";
+import { otpService } from "../services/otp-service.js";
+import { compare } from "../utils/encrypt-util.js";
+import { userService } from "../services/user-service.js";
 
 class AuthController {
   async register(req: Request, res: Response) {
@@ -60,6 +63,47 @@ class AuthController {
         message: "Logged successfully",
         accessToken: token,
       });
+    } catch {
+      res.status(500).json({ message: "Something was wrong" });
+    }
+  }
+
+  async validateOtp(req: Request, res: Response) {
+    try {
+      const { email, code } = req.body;
+      const otp = await otpService.getByEmail(email);
+
+      if (!otp) {
+        return res.status(404).json({ error: "Code not found" });
+      }
+
+      const isValidCode = await compare(code, otp.code);
+
+      if (!isValidCode) {
+        return res.status(403).json({ error: "Code is not correct" });
+      }
+
+      const user = await userService.getByEmail(email);
+
+      if (!user) {
+        return res.status(404).json({ error: "The user does'nt exist" });
+      }
+
+      await userService.update(user.id, {
+        verified: true,
+      });
+
+      return res.status(200).json({ message: "User verified" });
+    } catch {
+      res.status(500).json({ message: "Something was wrong" });
+    }
+  }
+
+  async resendValidationOtp(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+      await otpService.create(email);
+      res.status(200).send({ message: "User verified" });
     } catch {
       res.status(500).json({ message: "Something was wrong" });
     }
