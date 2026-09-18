@@ -1,7 +1,21 @@
 import { userRepository } from "../repositories/user-repository.js";
 import type { TUser } from "../schemas/user-schema.js";
+import type { TUserInput } from "../validations/user-validation.js";
+import { encrypt } from "../utils/encrypt-util.js";
 
 class UserService {
+  async create(data: TUserInput) {
+    try {
+      const hashed = await encrypt(data.password);
+      const user = { ...data, password: hashed };
+      const newUser = await userRepository.create(user);
+
+      return newUser;
+    } catch (error) {
+      throw new Error("Cannot get the user", { cause: error });
+    }
+  }
+
   async getById(id: string) {
     try {
       const deletedUser = await userRepository.getById(id);
