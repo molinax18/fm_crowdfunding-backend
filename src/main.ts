@@ -5,10 +5,12 @@ import { rewardRouter } from "./routes/reward-route.js";
 import { userRouter } from "./routes/user-route.js";
 import { validateToken } from "./middlewares/jwt-middleware.js";
 import { otpRouter } from "./routes/otp-route.js";
+import { limiter } from "./utils/rate_limit-util.js";
 import "dotenv/config";
 
 const PORT = process.env.PORT ?? 3000;
 const app = express();
+app.use(limiter);
 app.use(json());
 
 await connectToMongo();
