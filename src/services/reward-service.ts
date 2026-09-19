@@ -1,7 +1,7 @@
 import type { Types } from "mongoose";
+import type { TRewardInput } from "../validations/reward-validation.js";
 import { rewardRepository } from "../repositories/reward-repository.js";
 import { redisServer } from "../lib/redis-cache.js";
-import type { TRewardInput } from "../validations/reward-validation.js";
 
 class RewardService {
   async getAll() {

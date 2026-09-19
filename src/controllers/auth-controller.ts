@@ -61,7 +61,7 @@ class AuthController {
 
       return res.status(200).json({
         message: "Logged successfully",
-        accessToken: token,
+        accessToken: token.token,
       });
     } catch {
       res.status(500).json({ message: "Something was wrong" });
